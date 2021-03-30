@@ -20,7 +20,7 @@
 
 /*
 ------------------------------------------------------------------------------
-Реализация методов класса CTTYServerThreads
+Р РµР°Р»РёР·Р°С†РёСЏ РјРµС‚РѕРґРѕРІ РєР»Р°СЃСЃР° CTTYServerThreads
 ------------------------------------------------------------------------------
 */
 
@@ -29,14 +29,14 @@ void CTTYServerThread::checkSettingsChange()
 	std::lock_guard<std::mutex> lock(this->_mutex);
 	if (this->reconnectTCP)
 	{
-		//Необходимо перезагрузить TCP часть
+		//РќРµРѕР±С…РѕРґРёРјРѕ РїРµСЂРµР·Р°РіСЂСѓР·РёС‚СЊ TCP С‡Р°СЃС‚СЊ
 		this->reconnectTCP = false;
 		this->ClearQueue();
 		this->server.Close();
 	}
 	if (this->reconnectTTY)
 	{
-		//Необходимо перезагрузить TTY часть
+		//РќРµРѕР±С…РѕРґРёРјРѕ РїРµСЂРµР·Р°РіСЂСѓР·РёС‚СЊ TTY С‡Р°СЃС‚СЊ
 		this->reconnectTTY = false;
 		this->serial.Close();
 		this->serial.Baud(this->settings.tty.baud);
@@ -44,7 +44,7 @@ void CTTYServerThread::checkSettingsChange()
 		this->serial.Parity(this->settings.tty.parity);
 		this->serial.CTSRTS(this->settings.tty.cts_rts);
 	}
-	//Эта настройка не требует переинициализации
+	//Р­С‚Р° РЅР°СЃС‚СЂРѕР№РєР° РЅРµ С‚СЂРµР±СѓРµС‚ РїРµСЂРµРёРЅРёС†РёР°Р»РёР·Р°С†РёРё
 	this->serial.Interval(this->settings.interval);
 }
 
@@ -72,7 +72,7 @@ void CTTYServerThread::processTCPServer()
 
 		if (this->serial.Opened())
 		{
-			//Формирование пакета и размещение его в очереди
+			//Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РїР°РєРµС‚Р° Рё СЂР°Р·РјРµС‰РµРЅРёРµ РµРіРѕ РІ РѕС‡РµСЂРµРґРё
 			CPacket packet{ client->GetSocket() };
 			packet.SetSendBuff(std::move(buff));
 			this->data_queue.push(std::move(packet));
@@ -92,14 +92,14 @@ void CTTYServerThread::processTTY()
 	}
 	if (!this->serial.Receive())
 	{
-		//Произошла ошибка, возможно COM порт выдернули
+		//РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР°, РІРѕР·РјРѕР¶РЅРѕ COM РїРѕСЂС‚ РІС‹РґРµСЂРЅСѓР»Рё
 		this->serial.Close();
-		//т.к. порт не работоспособный смысла список пакетов держать нет
+		//С‚.Рє. РїРѕСЂС‚ РЅРµ СЂР°Р±РѕС‚РѕСЃРїРѕСЃРѕР±РЅС‹Р№ СЃРјС‹СЃР»Р° СЃРїРёСЃРѕРє РїР°РєРµС‚РѕРІ РґРµСЂР¶Р°С‚СЊ РЅРµС‚
 		this->ClearQueue();
 		return;
 	}
 
-	//Идёт получение данных
+	//РРґС‘С‚ РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…
 	std::vector<uint8_t>buff = this->serial.GetReceivedData();
 	if (buff.empty())
 		return;
@@ -123,16 +123,16 @@ void CTTYServerThread::Execute()
 {
 	while (!this->IsTerminated())
 	{
-		//Отработка алгоритмов изменения настроек
+		//РћС‚СЂР°Р±РѕС‚РєР° Р°Р»РіРѕСЂРёС‚РјРѕРІ РёР·РјРµРЅРµРЅРёСЏ РЅР°СЃС‚СЂРѕРµРє
 		this->checkSettingsChange();
 		this->processTCPServer();
 		this->processTTY();
 
-		//Отработка очереди пакетов
+		//РћС‚СЂР°Р±РѕС‚РєР° РѕС‡РµСЂРµРґРё РїР°РєРµС‚РѕРІ
 		if (!this->data_queue.empty())
 		{
 			auto& packet = this->data_queue.front();
-			//Проверка, вдруг этого клиента нет уже
+			//РџСЂРѕРІРµСЂРєР°, РІРґСЂСѓРі СЌС‚РѕРіРѕ РєР»РёРµРЅС‚Р° РЅРµС‚ СѓР¶Рµ
 			auto client = this->server.GetClients().find(packet.ClientID());
 			if (client == this->server.GetClients().end())
 			{
@@ -141,32 +141,32 @@ void CTTYServerThread::Execute()
 			}
 			if (packet.SendTime() == 0)
 			{
-				//Если время отправки не выставлено, значит этот пакет надо отправить в последовательный интерфейс
+				//Р•СЃР»Рё РІСЂРµРјСЏ РѕС‚РїСЂР°РІРєРё РЅРµ РІС‹СЃС‚Р°РІР»РµРЅРѕ, Р·РЅР°С‡РёС‚ СЌС‚РѕС‚ РїР°РєРµС‚ РЅР°РґРѕ РѕС‚РїСЂР°РІРёС‚СЊ РІ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹Р№ РёРЅС‚РµСЂС„РµР№СЃ
 				std::vector<uint8_t> in_buff = packet.GetSendBuff();
 #ifdef DEBUG
 				AddLog(Format("%s data from eth to tty: %s", this->Name().c_str(), HexToStr(in_buff).c_str()));
 #endif
 				if (!this->serial.Send(std::move(in_buff)))
 				{
-					//Отказ при отправке пакета, значит список надо очистить
+					//РћС‚РєР°Р· РїСЂРё РѕС‚РїСЂР°РІРєРµ РїР°РєРµС‚Р°, Р·РЅР°С‡РёС‚ СЃРїРёСЃРѕРє РЅР°РґРѕ РѕС‡РёСЃС‚РёС‚СЊ
 					this->ClearQueue();
 					this->serial.Close();
 					continue;
 				}
 
-				//Пакет отправился, значит отмечается время отправки и ожидается ответ
+				//РџР°РєРµС‚ РѕС‚РїСЂР°РІРёР»СЃСЏ, Р·РЅР°С‡РёС‚ РѕС‚РјРµС‡Р°РµС‚СЃСЏ РІСЂРµРјСЏ РѕС‚РїСЂР°РІРєРё Рё РѕР¶РёРґР°РµС‚СЃСЏ РѕС‚РІРµС‚
 				packet.SendTime(TimeTicks());
 			}
 			else
 			{
-				//Пакет был отправлен
+				//РџР°РєРµС‚ Р±С‹Р» РѕС‚РїСЂР°РІР»РµРЅ
 				std::vector<uint8_t> in_buff = packet.GetRecBuff();
 				if (in_buff.empty())
 				{
-					//Нет, ещё данных, проверка на таймаут
+					//РќРµС‚, РµС‰С‘ РґР°РЅРЅС‹С…, РїСЂРѕРІРµСЂРєР° РЅР° С‚Р°Р№РјР°СѓС‚
 					if (IsTimeExpired(packet.SendTime(), TimeTicks(), this->settings.timeout))
 					{
-						//Ответа нет, удаляется пакет из очереди
+						//РћС‚РІРµС‚Р° РЅРµС‚, СѓРґР°Р»СЏРµС‚СЃСЏ РїР°РєРµС‚ РёР· РѕС‡РµСЂРµРґРё
 						this->data_queue.pop();
 					}
 				}
@@ -175,7 +175,7 @@ void CTTYServerThread::Execute()
 #ifdef DEBUG
 					AddLog(Format("%s data from tty to eth: %s", this->Name().c_str(), HexToStr(in_buff).c_str()));
 #endif
-					//Данные есть, отправка их по Ethernet
+					//Р”Р°РЅРЅС‹Рµ РµСЃС‚СЊ, РѕС‚РїСЂР°РІРєР° РёС… РїРѕ Ethernet
 					client->second->Send(std::move(in_buff));
 					this->data_queue.pop();
 				}
@@ -197,7 +197,7 @@ void CTTYServerThread::SetSettings(TTYSettings & settings)
 	std::lock_guard<std::mutex> lock(this->_mutex);
 	if (this->settings != settings)
 	{
-		//Произошли изменения в настройках
+		//РџСЂРѕРёР·РѕС€Р»Рё РёР·РјРµРЅРµРЅРёСЏ РІ РЅР°СЃС‚СЂРѕР№РєР°С…
 		this->reconnectTCP = this->settings.reconnectTCP(settings);
 		this->reconnectTTY = this->settings.reconnectTTY(settings);
 		this->settings = settings;
@@ -206,7 +206,7 @@ void CTTYServerThread::SetSettings(TTYSettings & settings)
 
 /*
 ------------------------------------------------------------------------------
-Реализация методов класса CTTYServerThreadList
+Р РµР°Р»РёР·Р°С†РёСЏ РјРµС‚РѕРґРѕРІ РєР»Р°СЃСЃР° CTTYServerThreadList
 ------------------------------------------------------------------------------
 */
 
@@ -221,18 +221,18 @@ void CTTYServerThreadList::Clear()
 
 void CTTYServerThreadList::UpdateConfig(CTTYSettings & settings)
 {
-	//Временный список потоков, пока перемещаем в него всех
-	//Те кто останутся в pairs_list после обработки, будут удалены
+	//Р’СЂРµРјРµРЅРЅС‹Р№ СЃРїРёСЃРѕРє РїРѕС‚РѕРєРѕРІ, РїРѕРєР° РїРµСЂРµРјРµС‰Р°РµРј РІ РЅРµРіРѕ РІСЃРµС…
+	//РўРµ РєС‚Рѕ РѕСЃС‚Р°РЅСѓС‚СЃСЏ РІ pairs_list РїРѕСЃР»Рµ РѕР±СЂР°Р±РѕС‚РєРё, Р±СѓРґСѓС‚ СѓРґР°Р»РµРЅС‹
 	TTY_SERVER_LIST pairs_list{std::move(this->list)};
 
-	//Список сконфигурированных пар TTY - TCP порт
+	//РЎРїРёСЃРѕРє СЃРєРѕРЅС„РёРіСѓСЂРёСЂРѕРІР°РЅРЅС‹С… РїР°СЂ TTY - TCP РїРѕСЂС‚
 	for (auto & sett : settings.List())
 	{
-		//Поиск существующего потока
+		//РџРѕРёСЃРє СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РїРѕС‚РѕРєР°
 		auto it = pairs_list.find(sett.first);
 		if (it == pairs_list.end())
 		{
-			//С таким именем нет ещё, добавляется в список
+			//РЎ С‚Р°РєРёРј РёРјРµРЅРµРј РЅРµС‚ РµС‰С‘, РґРѕР±Р°РІР»СЏРµС‚СЃСЏ РІ СЃРїРёСЃРѕРє
 			auto sthread = std::make_unique<CTTYServerThread>(sett.first, sett.second);
 			sthread->Start();
 			this->list.emplace(sett.first, std::move(sthread));
@@ -240,7 +240,7 @@ void CTTYServerThreadList::UpdateConfig(CTTYSettings & settings)
 			continue;
 		}
 
-		//Переинициализация
+		//РџРµСЂРµРёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 		it->second->SetSettings(sett.second);
 		this->list.emplace(sett.first, std::move(it->second));
 	}

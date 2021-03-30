@@ -12,7 +12,7 @@
 #include "daemon.h"
 
 /*
-Функция запускает приложение как демон используя fork
+вЂСѓРЅРєС†РёВ¤ Р·Р°РїСѓСЃРєР°РµС‚ РїСЂРёР»РѕР¶РµРЅРёРµ РєР°Рє РґРµРјРѕРЅ РёСЃРїРѕР»СЊР·СѓВ¤ fork
 */
 void StartAsDaemon(const std::string & daemon_name)
 {
@@ -27,7 +27,7 @@ void StartAsDaemon(const std::string & daemon_name)
 	{
 		exit(EXIT_SUCCESS);
 	}
-	sid = setsid(); // генерируем уникальный индекс процесса
+	sid = setsid(); // РіРµРЅРµСЂРёСЂСѓРµРј СѓРЅРёРєР°Р»СЊРЅС‹Р№ РёРЅРґРµРєСЃ РїСЂРѕС†РµСЃСЃР°
 	if (sid < 0) 
 	{
 		exit(EXIT_FAILURE);

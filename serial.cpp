@@ -14,7 +14,7 @@
 
 /*
 ------------------------------------------------------------------------------
-Реализация методов класса CSerial
+Р РµР°Р»РёР·Р°С†РёСЏ РјРµС‚РѕРґРѕРІ РєР»Р°СЃСЃР° CSerial
 ------------------------------------------------------------------------------
 */
 CSerial::CSerial(const std::string & fname)
@@ -36,7 +36,7 @@ CSerial::~CSerial()
 }
 
 /*
-Функция открывает COM порт
+Р¤СѓРЅРєС†РёСЏ РѕС‚РєСЂС‹РІР°РµС‚ COM РїРѕСЂС‚
 */
 bool CSerial::Open()
 {
@@ -46,7 +46,7 @@ bool CSerial::Open()
 	this->waiting = false;
 	this->rec_stamp = 0;
 	
-	//Открывается COM порт
+	//РћС‚РєСЂС‹РІР°РµС‚СЃСЏ COM РїРѕСЂС‚
 	this->fd = open(this->full_path.c_str(), O_RDWR | O_NONBLOCK | O_NOCTTY | O_NDELAY);
 	if (this->fd == -1)
 		return false;
@@ -54,7 +54,7 @@ bool CSerial::Open()
 	struct termios term;
 	memset(&term, 0, sizeof(term));
 	
-	//Устанавливается скорость обмена
+	//РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ СЃРєРѕСЂРѕСЃС‚СЊ РѕР±РјРµРЅР°
 	int speed;
 	switch (baud)
 	{	
@@ -93,44 +93,44 @@ bool CSerial::Open()
 	}
 	
 	/*
-	CREAD - включить прием
-	CLOCAL - игнорировать управление линиями с помошью
+	CREAD - РІРєР»СЋС‡РёС‚СЊ РїСЂРёРµРј
+	CLOCAL - РёРіРЅРѕСЂРёСЂРѕРІР°С‚СЊ СѓРїСЂР°РІР»РµРЅРёРµ Р»РёРЅРёСЏРјРё СЃ РїРѕРјРѕС€СЊСЋ
 	*/
 	term.c_cflag |= (CREAD | CLOCAL);
-	//CSIZE - маска размера символа
+	//CSIZE - РјР°СЃРєР° СЂР°Р·РјРµСЂР° СЃРёРјРІРѕР»Р°
 	term.c_cflag &= ~CSIZE;
-	//CS8 - 8 битные символы
+	//CS8 - 8 Р±РёС‚РЅС‹Рµ СЃРёРјРІРѕР»С‹
 	term.c_cflag |= CS8;	
-	//CSTOPB - при 1 - два стоп бита, при 0 - один
+	//CSTOPB - РїСЂРё 1 - РґРІР° СЃС‚РѕРї Р±РёС‚Р°, РїСЂРё 0 - РѕРґРёРЅ
 	if (this->stopbits == STOPBITS_ONE)
 		term.c_cflag &= ~CSTOPB;
 	else
 		term.c_cflag |= CSTOPB;
-	//Аппаратное управление потоком
+	//РђРїРїР°СЂР°С‚РЅРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ РїРѕС‚РѕРєРѕРј
 	if (this->cts_rts)
 		term.c_cflag |= CRTSCTS;
 	else
 		term.c_cflag &= ~CRTSCTS;
 
-	//Бит паритета
+	//Р‘РёС‚ РїР°СЂРёС‚РµС‚Р°
 	switch (this->parity)
 	{
-	//Нет бита паритета
+	//РќРµС‚ Р±РёС‚Р° РїР°СЂРёС‚РµС‚Р°
 	case PARITY_NONE:
-		//Выключается проверка четности
+		//Р’С‹РєР»СЋС‡Р°РµС‚СЃСЏ РїСЂРѕРІРµСЂРєР° С‡РµС‚РЅРѕСЃС‚Рё
 		term.c_iflag &= ~INPCK;
 		term.c_cflag &= ~PARODD;
 		term.c_cflag &= ~PARENB;
 		break;
 		
-	//Нечётный
+	//РќРµС‡С‘С‚РЅС‹Р№
 	case PARITY_ODD:
 		term.c_iflag |= INPCK;
 		term.c_cflag |= PARODD;
 		term.c_cflag |= PARENB;
 		break;
 		
-	//Чётный
+	//Р§С‘С‚РЅС‹Р№
 	case PARITY_EVEN:
 		term.c_iflag |= INPCK;
 		term.c_cflag &= ~PARODD;
@@ -138,21 +138,21 @@ bool CSerial::Open()
 		break;
 	}
 	
-	//Применение настроек
+	//РџСЂРёРјРµРЅРµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє
 	if (tcsetattr(this->fd, TCSANOW, &term) < 0)
 	{
 		this->Close();
 		return false;
 	}	
 	
-	//очищаем входной и выходной буфер
+	//РѕС‡РёС‰Р°РµРј РІС…РѕРґРЅРѕР№ Рё РІС‹С…РѕРґРЅРѕР№ Р±СѓС„РµСЂ
 	tcflush(fd, TCIOFLUSH);	
 
 	return true;
 }
 
 /*
-Функция закрывает COM порт
+Р¤СѓРЅРєС†РёСЏ Р·Р°РєСЂС‹РІР°РµС‚ COM РїРѕСЂС‚
 */
 void CSerial::Close()
 {
@@ -164,11 +164,11 @@ void CSerial::Close()
 }
 
 /*
-Прием данных
+РџСЂРёРµРј РґР°РЅРЅС‹С…
 */
 bool CSerial::Receive()
 {
-	//Наборы для работы
+	//РќР°Р±РѕСЂС‹ РґР»СЏ СЂР°Р±РѕС‚С‹
 	fd_set readSet;
 	FD_ZERO(&readSet);
 	FD_SET(this->fd, &readSet);
@@ -178,12 +178,12 @@ bool CSerial::Receive()
 	if (res < 0)
 		return false;
 
-	//Вроде что то есть
+	//Р’СЂРѕРґРµ С‡С‚Рѕ С‚Рѕ РµСЃС‚СЊ
 	std::array<uint8_t, 255> buff;
 	auto retval = read(this->fd, buff.data(), buff.size());
 	if (retval > 0)
 	{
-		//Данные пришли
+		//Р”Р°РЅРЅС‹Рµ РїСЂРёС€Р»Рё
 		std::copy(buff.begin(), std::next(buff.begin(), retval), std::back_inserter(this->data));
 #ifdef DEBUG
 		AddLog(Format("Data in internal buffer of '%s' %u bytes", this->fname.c_str(), this->data.size()));
@@ -195,12 +195,12 @@ bool CSerial::Receive()
 	{
 		if (errno == EAGAIN)
 		{
-			//Всё нормально, ждём...
+			//Р’СЃС‘ РЅРѕСЂРјР°Р»СЊРЅРѕ, Р¶РґС‘Рј...
 			if (this->data.empty())
 				this->rec_stamp = TimeTicks();
 		}
 		else
-			return false; //Возникла ошибка
+			return false; //Р’РѕР·РЅРёРєР»Р° РѕС€РёР±РєР°
 	}
 
 	return true;
@@ -219,20 +219,20 @@ bool CSerial::send()
 }
 	
 /*
-Возвращает в указанный буфер данные
+Р’РѕР·РІСЂР°С‰Р°РµС‚ РІ СѓРєР°Р·Р°РЅРЅС‹Р№ Р±СѓС„РµСЂ РґР°РЅРЅС‹Рµ
 */
 std::vector<uint8_t> CSerial::GetReceivedData()
 {
 	std::vector<uint8_t> result;
 	if (this->waiting && IsTimeExpired(this->rec_stamp, TimeTicks(), this->interval))
 	{
-		//Истекло время после последнего прихода байта
+		//РСЃС‚РµРєР»Рѕ РІСЂРµРјСЏ РїРѕСЃР»Рµ РїРѕСЃР»РµРґРЅРµРіРѕ РїСЂРёС…РѕРґР° Р±Р°Р№С‚Р°
 		this->waiting = false;
 		result.swap(this->data);
 		this->data.clear();
 	}
 
-	//Возвращается пустой вектор
+	//Р’РѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РїСѓСЃС‚РѕР№ РІРµРєС‚РѕСЂ
 	return result;
 }
 

@@ -17,7 +17,7 @@
 #include <sys/resource.h>
 
 /*
-	Функция проверяет наличие файла
+	Р¤СѓРЅРєС†РёСЏ РїСЂРѕРІРµСЂСЏРµС‚ РЅР°Р»РёС‡РёРµ С„Р°Р№Р»Р°
 */
 bool IsFileExists(const std::string & filename)
 {
@@ -28,7 +28,7 @@ bool IsFileExists(const std::string & filename)
 }
 
 /*
-Функция проверяет не истекло время
+Р¤СѓРЅРєС†РёСЏ РїСЂРѕРІРµСЂСЏРµС‚ РЅРµ РёСЃС‚РµРєР»Рѕ РІСЂРµРјСЏ
 */
 bool IsTimeExpired(const uint64_t & timestamp, const uint64_t & curr, const uint64_t & period)
 {
@@ -37,7 +37,7 @@ bool IsTimeExpired(const uint64_t & timestamp, const uint64_t & curr, const uint
 }
 
 /*
-Время в мс прошедшее от старта системы
+Р’СЂРµРјСЏ РІ РјСЃ РїСЂРѕС€РµРґС€РµРµ РѕС‚ СЃС‚Р°СЂС‚Р° СЃРёСЃС‚РµРјС‹
 */
 uint64_t TimeTicks(void)
 {	
@@ -46,14 +46,14 @@ uint64_t TimeTicks(void)
 	clock_gettime(CLOCK_MONOTONIC, &spec);	
 	uint64_t t = static_cast<uint64_t>(spec.tv_sec);
 	t *= 1000;	
-	//Общее количество мс прошедших с момента запуска системы
+	//РћР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РјСЃ РїСЂРѕС€РµРґС€РёС… СЃ РјРѕРјРµРЅС‚Р° Р·Р°РїСѓСЃРєР° СЃРёСЃС‚РµРјС‹
 	t = static_cast<uint64_t>(round(static_cast<double>(spec.tv_nsec) / 1.0e6)) + t;
 	
 	return t;
 }
 
 /*
-Функция форматирования строки
+Р¤СѓРЅРєС†РёСЏ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёСЏ СЃС‚СЂРѕРєРё
 */
 std::string Format(const char * fmt, ...)
 {
@@ -74,20 +74,17 @@ std::string Format(const char * fmt, ...)
 }
 
 /*
-По номеру ошибки возвращает строку с её описанием
+РџРѕ РЅРѕРјРµСЂСѓ РѕС€РёР±РєРё РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєСѓ СЃ РµС‘ РѕРїРёСЃР°РЅРёРµРј
 */
 std::string ErrorToStr(int errnum) 
 {
 	char* e = strerror(errnum);
 
-	if (e != nullptr)
-		return std::string(e);
-	else
-		return "";
+	return e != nullptr ? std::string(e) : "";
 }
 
 /*
-Функция генерирует уникальный неповторяющийся идентификатор
+Р¤СѓРЅРєС†РёСЏ РіРµРЅРµСЂРёСЂСѓРµС‚ СѓРЅРёРєР°Р»СЊРЅС‹Р№ РЅРµРїРѕРІС‚РѕСЂСЏСЋС‰РёР№СЃСЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 uint64_t uniqueID = 0;
 std::mutex uniqueID_mutex;
@@ -101,7 +98,7 @@ uint64_t UniqueID()
 }
 
 /*
-Функция снимает ограничение для процесса на количество открытых фалов
+Р¤СѓРЅРєС†РёСЏ СЃРЅРёРјР°РµС‚ РѕРіСЂР°РЅРёС‡РµРЅРёРµ РґР»СЏ РїСЂРѕС†РµСЃСЃР° РЅР° РєРѕР»РёС‡РµСЃС‚РІРѕ РѕС‚РєСЂС‹С‚С‹С… С„Р°Р»РѕРІ
 */
 bool SetNoFilesLimit()
 {
@@ -110,7 +107,7 @@ bool SetNoFilesLimit()
 }
 
 /*
-Возвращает буфер в виде строки байтов
+Р’РѕР·РІСЂР°С‰Р°РµС‚ Р±СѓС„РµСЂ РІ РІРёРґРµ СЃС‚СЂРѕРєРё Р±Р°Р№С‚РѕРІ
 */
 std::string HexToStr(const std::vector<uint8_t>& buff)
 {

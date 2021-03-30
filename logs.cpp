@@ -15,7 +15,7 @@ std::string def_log = "";
 CLogs* logs = NULL;
 
 /*
-Функция выставляет значение файл с логами по умолчанию
+Р¤СѓРЅРєС†РёСЏ РІС‹СЃС‚Р°РІР»СЏРµС‚ Р·РЅР°С‡РµРЅРёРµ С„Р°Р№Р» СЃ Р»РѕРіР°РјРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 void SetDefLogFile(const std::string & deflog)
 {
@@ -23,11 +23,11 @@ void SetDefLogFile(const std::string & deflog)
 }
 
 /*
-Функция в указанный файл добавляет сообщение
+Р¤СѓРЅРєС†РёСЏ РІ СѓРєР°Р·Р°РЅРЅС‹Р№ С„Р°Р№Р» РґРѕР±Р°РІР»СЏРµС‚ СЃРѕРѕР±С‰РµРЅРёРµ
 */
 int WriteLog(const std::string & msg, const std::string & filename)
 {
-	// функция записи строки в лог
+	// С„СѓРЅРєС†РёСЏ Р·Р°РїРёСЃРё СЃС‚СЂРѕРєРё РІ Р»РѕРі
 	std::stringstream ss;
 	ss << msg << endl;
 
@@ -47,7 +47,7 @@ int WriteLog(const std::string & msg, const std::string & filename)
 	return 0;
 }
 
-//Функция в указанный файл добавляет сообщение
+//Р¤СѓРЅРєС†РёСЏ РІ СѓРєР°Р·Р°РЅРЅС‹Р№ С„Р°Р№Р» РґРѕР±Р°РІР»СЏРµС‚ СЃРѕРѕР±С‰РµРЅРёРµ
 int WriteLog(const std::string & msg)
 {
 	return WriteLog(msg, def_log);
@@ -63,7 +63,7 @@ void CreateLogs(const std::string & logfile)
 	}
 }
 
-//Удаление списка команд
+//РЈРґР°Р»РµРЅРёРµ СЃРїРёСЃРєР° РєРѕРјР°РЅРґ
 void ClearLogs()
 {
 	if (logs != NULL)
@@ -74,7 +74,7 @@ void ClearLogs()
 	}
 }
 
-//Добавление записи
+//Р”РѕР±Р°РІР»РµРЅРёРµ Р·Р°РїРёСЃРё
 void AddLog(const std::string & message)
 {
 	if (logs == NULL)
@@ -90,7 +90,7 @@ void CLogs::Execute()
 		this->saveMessages();
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
-	//Вдруг что осталось еще
+	//Р’РґСЂСѓРі С‡С‚Рѕ РѕСЃС‚Р°Р»РѕСЃСЊ РµС‰Рµ
 	this->saveMessages();
 }
 
@@ -105,7 +105,7 @@ CLogs::~CLogs()
 	this->Clear();
 }
 
-//Функция добавления sql команды в список
+//Р¤СѓРЅРєС†РёСЏ РґРѕР±Р°РІР»РµРЅРёСЏ sql РєРѕРјР°РЅРґС‹ РІ СЃРїРёСЃРѕРє
 void CLogs::Add(const string & message)
 {
 	if (this->IsTerminated())
@@ -117,7 +117,7 @@ void CLogs::Add(const string & message)
 	this->messages.push(log);
 }
 
-//Извлекает из списка первую команду на выполнение
+//РР·РІР»РµРєР°РµС‚ РёР· СЃРїРёСЃРєР° РїРµСЂРІСѓСЋ РєРѕРјР°РЅРґСѓ РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ
 std::string CLogs::getFirst()
 {
 	std::lock_guard<std::mutex> lock(this->_mutex);
@@ -138,12 +138,12 @@ void CLogs::saveMessages()
 	std::string message;
 	while ((message = this->getFirst()) != "")
 	{
-		//До тех пор пока есть данные поток крутится в этом цикле
+		//Р”Рѕ С‚РµС… РїРѕСЂ РїРѕРєР° РµСЃС‚СЊ РґР°РЅРЅС‹Рµ РїРѕС‚РѕРє РєСЂСѓС‚РёС‚СЃСЏ РІ СЌС‚РѕРј С†РёРєР»Рµ
 		WriteLog(message, this->logfile);
 	}
 }
 
-//Очистка списка команд
+//РћС‡РёСЃС‚РєР° СЃРїРёСЃРєР° РєРѕРјР°РЅРґ
 void CLogs::Clear()
 {
 	std::lock_guard<std::mutex> lock(this->_mutex);

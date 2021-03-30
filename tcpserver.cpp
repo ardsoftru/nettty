@@ -16,7 +16,7 @@
 
 /*
 ------------------------------------------------------------------------------
-Реализация методов класса CTCPServer
+Р РµР°Р»РёР·Р°С†РёСЏ РјРµС‚РѕРґРѕРІ РєР»Р°СЃСЃР° CTCPServer
 ------------------------------------------------------------------------------
 */
 std::unique_ptr<CTCPServerClient> CTCPServer::createClient(int sock)
@@ -45,7 +45,7 @@ CTCPServer::~CTCPServer(void)
 }
 
 /*
-Запуск TCP сервера
+Р—Р°РїСѓСЃРє TCP СЃРµСЂРІРµСЂР°
 */
 void CTCPServer::Open(const std::string & interface, uint16_t port)
 {
@@ -57,7 +57,7 @@ void CTCPServer::Open(const std::string & interface, uint16_t port)
 	if (this->sock < 0)
 		return;
 
-	//Это что бы после аварийного завершения система сразу разрешила открыть порт
+	//Р­С‚Рѕ С‡С‚Рѕ Р±С‹ РїРѕСЃР»Рµ Р°РІР°СЂРёР№РЅРѕРіРѕ Р·Р°РІРµСЂС€РµРЅРёСЏ СЃРёСЃС‚РµРјР° СЃСЂР°Р·Сѓ СЂР°Р·СЂРµС€РёР»Р° РѕС‚РєСЂС‹С‚СЊ РїРѕСЂС‚
 	int one = 1;
 	if ((setsockopt(this->sock,	SOL_SOCKET,	SO_REUSEADDR, &one, sizeof(one))) == -1)
 	{
@@ -66,7 +66,7 @@ void CTCPServer::Open(const std::string & interface, uint16_t port)
 		return;
 	}
 
-	//Неблокирующий сокет
+	//РќРµР±Р»РѕРєРёСЂСѓСЋС‰РёР№ СЃРѕРєРµС‚
 	this->setnonblocking(this->sock);
 
 	this->efd = epoll_create1(0);
@@ -122,11 +122,11 @@ void CTCPServer::close_descriptors()
 }
 
 /*
-Функция работает с клиентами
+Р¤СѓРЅРєС†РёСЏ СЂР°Р±РѕС‚Р°РµС‚ СЃ РєР»РёРµРЅС‚Р°РјРё
 */
 bool CTCPServer::Accept(int timeout)
 {
-	//Ожидание поступления события
+	//РћР¶РёРґР°РЅРёРµ РїРѕСЃС‚СѓРїР»РµРЅРёСЏ СЃРѕР±С‹С‚РёСЏ
 	std::vector<epoll_event> events(this->clients.size() + 1);
 	int nfds = epoll_wait(this->efd, events.data(), this->clients.size() + 1, timeout);
 	if (nfds < 0)
@@ -139,7 +139,7 @@ bool CTCPServer::Accept(int timeout)
 	{
 		if (events[i].data.fd == this->sock)
 		{
-			//Подключение нового клиента
+			//РџРѕРґРєР»СЋС‡РµРЅРёРµ РЅРѕРІРѕРіРѕ РєР»РёРµРЅС‚Р°
 			struct sockaddr_in addr { 0 };
 
 			addr.sin_family = AF_INET;
@@ -175,29 +175,29 @@ bool CTCPServer::Accept(int timeout)
 			if (client == this->clients.end())
 				continue;
 
-			//Событие от существующего клиента
+			//РЎРѕР±С‹С‚РёРµ РѕС‚ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РєР»РёРµРЅС‚Р°
 			if (events[i].events & EPOLLIN)
 			{
-				//Что то пришло
+				//Р§С‚Рѕ С‚Рѕ РїСЂРёС€Р»Рѕ
 				if (!client->second->receiveData())
 				{
-					//Ошибка, клиент заносится в список на удаление
+					//РћС€РёР±РєР°, РєР»РёРµРЅС‚ Р·Р°РЅРѕСЃРёС‚СЃСЏ РІ СЃРїРёСЃРѕРє РЅР° СѓРґР°Р»РµРЅРёРµ
 					this->deleteClient(client);
 				}
 			}
 			else if (events[i].events & EPOLLOUT)
 			{
-				//Отправка данных
+				//РћС‚РїСЂР°РІРєР° РґР°РЅРЅС‹С…
 				if (!client->second->sendData())
 				{
-					//Ошибка, клиент заносится в список на удаление
+					//РћС€РёР±РєР°, РєР»РёРµРЅС‚ Р·Р°РЅРѕСЃРёС‚СЃСЏ РІ СЃРїРёСЃРѕРє РЅР° СѓРґР°Р»РµРЅРёРµ
 					//AddLog(Format("Error on send, client: %u", client->GetSocket()));
 					this->deleteClient(client);
 				}
 			}
 			else if (events[i].events & EPOLLRDHUP)
 			{
-				//Ошибка, клиент заносится в список на удаление
+				//РћС€РёР±РєР°, РєР»РёРµРЅС‚ Р·Р°РЅРѕСЃРёС‚СЃСЏ РІ СЃРїРёСЃРѕРє РЅР° СѓРґР°Р»РµРЅРёРµ
 				AddLog(Format("Error on socket, client: %u", client->second->GetSocket()));
 				this->deleteClient(client);
 			}
@@ -213,7 +213,7 @@ TCPSERVER_CLIENTS_LIST & CTCPServer::GetClients()
 }
 
 /*
-Останов TCP сервера
+РћСЃС‚Р°РЅРѕРІ TCP СЃРµСЂРІРµСЂР°
 */
 void CTCPServer::Close()
 {
@@ -229,7 +229,7 @@ void CTCPServer::Close()
 }
 
 /*
-флаг успешного открытия сокета
+С„Р»Р°Рі СѓСЃРїРµС€РЅРѕРіРѕ РѕС‚РєСЂС‹С‚РёСЏ СЃРѕРєРµС‚Р°
 */
 bool CTCPServer::Opened()
 {
@@ -241,7 +241,7 @@ bool CTCPServer::Opened()
 
 /*
 ------------------------------------------------------------------------------
-Реализация методов класса CTCPServerClient
+Р РµР°Р»РёР·Р°С†РёСЏ РјРµС‚РѕРґРѕРІ РєР»Р°СЃСЃР° CTCPServerClient
 ------------------------------------------------------------------------------
 */
 CTCPServerClient::CTCPServerClient(int sock)
@@ -263,7 +263,7 @@ CTCPServerClient::~CTCPServerClient(void)
 }
 
 /*
-Возвращает сокет клиента
+Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРѕРєРµС‚ РєР»РёРµРЅС‚Р°
 */
 int CTCPServerClient::GetSocket()
 {
@@ -271,25 +271,25 @@ int CTCPServerClient::GetSocket()
 }
 
 /*
-Прием данных
+РџСЂРёРµРј РґР°РЅРЅС‹С…
 */
 bool CTCPServerClient::receiveData()
 {
-	//Прием данных
+	//РџСЂРёРµРј РґР°РЅРЅС‹С…
 
-	//Вроде что то есть
+	//Р’СЂРѕРґРµ С‡С‚Рѕ С‚Рѕ РµСЃС‚СЊ
 	std::array<uint8_t, 255> buff;
 	auto retval = read(this->sock, buff.data(), buff.size());
 	if (retval > 0)
 	{
-		//Данные пришли
+		//Р”Р°РЅРЅС‹Рµ РїСЂРёС€Р»Рё
 		std::copy(buff.begin(), std::next(buff.begin(), retval), std::back_inserter(this->receiveBuff));
 		this->rec_stamp = TimeTicks();
 		this->waiting = true;
 	}
 	else if (retval == 0)
 	{
-		//Клиент закрыл соединение
+		//РљР»РёРµРЅС‚ Р·Р°РєСЂС‹Р» СЃРѕРµРґРёРЅРµРЅРёРµ
 		AddLog(Format("Error on receive, client: %u, recv error: %s, retval = %d", this->GetSocket(), ErrorToStr(errno).c_str(), retval));
 		return false;
 	}
@@ -297,14 +297,14 @@ bool CTCPServerClient::receiveData()
 	{
 		if (errno == EWOULDBLOCK)
 		{
-			//Всё нормально, ждём...
+			//Р’СЃС‘ РЅРѕСЂРјР°Р»СЊРЅРѕ, Р¶РґС‘Рј...
 			if (this->receiveBuff.empty())
 				this->rec_stamp = TimeTicks();
 		}
 		else
 		{
 			AddLog(Format("Error on receive, client: %u, recv error: %s, retval = %d", this->GetSocket(), ErrorToStr(errno).c_str(), retval));
-			return false; //Возникла ошибка
+			return false; //Р’РѕР·РЅРёРєР»Р° РѕС€РёР±РєР°
 		}
 	}
 
@@ -312,14 +312,14 @@ bool CTCPServerClient::receiveData()
 }
 
 /*
-Возвращает в указанный буфер данные
+Р’РѕР·РІСЂР°С‰Р°РµС‚ РІ СѓРєР°Р·Р°РЅРЅС‹Р№ Р±СѓС„РµСЂ РґР°РЅРЅС‹Рµ
 */
 std::vector<uint8_t> CTCPServerClient::GetReceivedData()
 {
 	std::vector<uint8_t> result;
 	if (this->waiting && IsTimeExpired(this->rec_stamp, TimeTicks(), this->interval))
 	{
-		//Истекло время после последнего прихода байта
+		//РСЃС‚РµРєР»Рѕ РІСЂРµРјСЏ РїРѕСЃР»Рµ РїРѕСЃР»РµРґРЅРµРіРѕ РїСЂРёС…РѕРґР° Р±Р°Р№С‚Р°
 		result.swap(this->receiveBuff);
 		this->receiveBuff.clear();
 		this->waiting = false;
@@ -333,7 +333,7 @@ bool CTCPServerClient::sendData()
 	while (!this->sendDataList.empty())
 	{
 		const auto& data = this->sendDataList.front();
-		//Отпрвка буфера с данными
+		//РћС‚РїСЂРІРєР° Р±СѓС„РµСЂР° СЃ РґР°РЅРЅС‹РјРё
 		ssize_t sent = send(this->sock, data.data(), data.size(), 0);
 
 		if (static_cast<ssize_t>(data.size()) != sent)
@@ -343,7 +343,7 @@ bool CTCPServerClient::sendData()
 		{
 			if (errno == EWOULDBLOCK)
 			{
-				//Если сразу отправить не получается то пока притормаживаем отправку
+				//Р•СЃР»Рё СЃСЂР°Р·Сѓ РѕС‚РїСЂР°РІРёС‚СЊ РЅРµ РїРѕР»СѓС‡Р°РµС‚СЃСЏ С‚Рѕ РїРѕРєР° РїСЂРёС‚РѕСЂРјР°Р¶РёРІР°РµРј РѕС‚РїСЂР°РІРєСѓ
 				this->sendDataList.pop();
 				break;
 			}
@@ -361,7 +361,7 @@ epoll_event & CTCPServerClient::GetConnEvnt()
 }
 
 /*
-Закрытие сокета
+Р—Р°РєСЂС‹С‚РёРµ СЃРѕРєРµС‚Р°
 */
 void CTCPServerClient::Close()
 {

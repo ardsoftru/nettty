@@ -16,30 +16,30 @@
 #include "ttyserver.h"
 
 #ifdef DEBUG
-//Путь к файлу с логом
+//РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ СЃ Р»РѕРіРѕРј
 const std::string log_file = "/tmp/nettty.log";
-//Путь к файлу с конфигурацией
+//РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ СЃ РєРѕРЅС„РёРіСѓСЂР°С†РёРµР№
 const std::string config_path = "/home/pi/nettty/config";
 #else
-//Путь к файлу с логом
+//РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ СЃ Р»РѕРіРѕРј
 const std::string log_file = "/tmp/nettty.log";
-//Путь к файлу с конфигурацией
+//РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ СЃ РєРѕРЅС„РёРіСѓСЂР°С†РёРµР№
 const std::string config_path = "/opt/nettty/config";
 #endif // DEBUG
 
-//Флаг работы
+//Р¤Р»Р°Рі СЂР°Р±РѕС‚С‹
 bool running = true;
 
-//Версия ПО
+//Р’РµСЂСЃРёСЏ РџРћ
 #define version "0.4"
 
-//Класс для работы с настройками
+//РљР»Р°СЃСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РЅР°СЃС‚СЂРѕР№РєР°РјРё
 CTTYSettings tty_settings(config_path);
-//класс для работы со списком пар TTY - TCP порт
+//РєР»Р°СЃСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃРѕ СЃРїРёСЃРєРѕРј РїР°СЂ TTY - TCP РїРѕСЂС‚
 CTTYServerThreadList tty_list;
 
 /*
-Функция корректного завершения приложения
+Р¤СѓРЅРєС†РёСЏ РєРѕСЂСЂРµРєС‚РЅРѕРіРѕ Р·Р°РІРµСЂС€РµРЅРёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 void stopApp()
 {
@@ -47,7 +47,7 @@ void stopApp()
 
 	AddLog("NetTTY successfully stopped.");
 
-	//Останов системы логирования
+	//РћСЃС‚Р°РЅРѕРІ СЃРёСЃС‚РµРјС‹ Р»РѕРіРёСЂРѕРІР°РЅРёСЏ
 	ClearLogs();
 }
 
@@ -56,29 +56,29 @@ void signals_handler(int sig)
 	switch (sig)
 	{
 	case SIGTERM:
-		//Сбрасывается флаг разрешающий работу
+		//РЎР±СЂР°СЃС‹РІР°РµС‚СЃСЏ С„Р»Р°Рі СЂР°Р·СЂРµС€Р°СЋС‰РёР№ СЂР°Р±РѕС‚Сѓ
 		running = false;
 		break;
 	}
 }
 
 /*
-Функция инициализации приложения
+Р¤СѓРЅРєС†РёСЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 void initApp()
 {
-	//Запуск системы логирования
+	//Р—Р°РїСѓСЃРє СЃРёСЃС‚РµРјС‹ Р»РѕРіРёСЂРѕРІР°РЅРёСЏ
 	CreateLogs(log_file);
 
 	AddLog("Starting NetTTY...");
 
-	//Инициализация перехвата системных событий
+	//РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРµСЂРµС…РІР°С‚Р° СЃРёСЃС‚РµРјРЅС‹С… СЃРѕР±С‹С‚РёР№
 	struct sigaction sa;
 	memset(&sa, 0, sizeof(sa));
-	sa.sa_handler = signals_handler;  // указываем обработчик
+	sa.sa_handler = signals_handler;  // СѓРєР°Р·С‹РІР°РµРј РѕР±СЂР°Р±РѕС‚С‡РёРє
 	sigset_t   set;
 	sigemptyset(&set);
-	sigaddset(&set, SIGTERM); //Перехват события Terminate
+	sigaddset(&set, SIGTERM); //РџРµСЂРµС…РІР°С‚ СЃРѕР±С‹С‚РёСЏ Terminate
 	sa.sa_mask = set;
 	sigaction(SIGTERM, &sa, NULL);
 
@@ -91,21 +91,21 @@ void initApp()
 int main(int argc, char* arcgv[])
 {
 #ifndef DEBUG
-	//Запуск приложения как демона
+	//Р—Р°РїСѓСЃРє РїСЂРёР»РѕР¶РµРЅРёСЏ РєР°Рє РґРµРјРѕРЅР°
 	StartAsDaemon("nettty");
 #endif
 
-	//Инициализация
+	//РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 	initApp();
-	//Загрузка конфигурации
+	//Р—Р°РіСЂСѓР·РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 	tty_settings.LoadSettings(config_path);
 	tty_list.UpdateConfig(tty_settings);
 
 	while (running)
 	{
-		//Отработка по изменению настроек
+		//РћС‚СЂР°Р±РѕС‚РєР° РїРѕ РёР·РјРµРЅРµРЅРёСЋ РЅР°СЃС‚СЂРѕРµРє
 		tty_settings.Process();
-		//Проверка
+		//РџСЂРѕРІРµСЂРєР°
 		if (!running)
 			break;
 
@@ -117,7 +117,7 @@ int main(int argc, char* arcgv[])
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
-	//Останов системы
+	//РћСЃС‚Р°РЅРѕРІ СЃРёСЃС‚РµРјС‹
 	stopApp();
 
 	return EXIT_SUCCESS;

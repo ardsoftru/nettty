@@ -9,7 +9,7 @@
 
 /*
 ------------------------------------------------------------------------------
-Реализация методов класса CTCPServer
+Р РµР°Р»РёР·Р°С†РёСЏ РјРµС‚РѕРґРѕРІ РєР»Р°СЃСЃР° CTCPServer
 ------------------------------------------------------------------------------
 */
 
@@ -34,19 +34,19 @@ CThread::~CThread()
 
 bool CThread::Start()
 {
-	//Блокируется _thread
+	//Р‘Р»РѕРєРёСЂСѓРµС‚СЃСЏ _thread
 	std::lock_guard<std::mutex> lock(this->_mutex);
 	if (this->_thread.joinable() )
 		return false;
 
-	//Запуск потока
+	//Р—Р°РїСѓСЃРє РїРѕС‚РѕРєР°
 	this->terminated = false;
 	this->_thread = std::thread([this]() 
 		{
 			this->Execute();
 		});
 
-	//Если указано имя то его надо присвоить потоку
+	//Р•СЃР»Рё СѓРєР°Р·Р°РЅРѕ РёРјСЏ С‚Рѕ РµРіРѕ РЅР°РґРѕ РїСЂРёСЃРІРѕРёС‚СЊ РїРѕС‚РѕРєСѓ
 	if (this->name != "")
 		pthread_setname_np(this->_thread.native_handle(), this->name.c_str());
 
@@ -55,7 +55,7 @@ bool CThread::Start()
 
 void CThread::Stop()
 {
-	//Блокируется _thread
+	//Р‘Р»РѕРєРёСЂСѓРµС‚СЃСЏ _thread
 	std::lock_guard<std::mutex> lock(this->_mutex);
 	if (!this->_thread.joinable())
 		return;

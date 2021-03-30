@@ -25,13 +25,13 @@ CFileCheck::~CFileCheck()
 }
 
 /*
-Флаг того что произошло обновление
+Р¤Р»Р°Рі С‚РѕРіРѕ С‡С‚Рѕ РїСЂРѕРёР·РѕС€Р»Рѕ РѕР±РЅРѕРІР»РµРЅРёРµ
 */
 bool CFileCheck::Updated()
 {
 	if (this->inotify == INOTIFY_ERROR)
 	{
-		//Инициализация системы отслеживающей изменения в файле serial.config
+		//РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРёСЃС‚РµРјС‹ РѕС‚СЃР»РµР¶РёРІР°СЋС‰РµР№ РёР·РјРµРЅРµРЅРёСЏ РІ С„Р°Р№Р»Рµ serial.config
 		this->inotify = inotify_init();
 		if (this->inotify != -1)
 		{
@@ -55,18 +55,18 @@ bool CFileCheck::Updated()
 	int res = select(this->inotify + 1, &change_set, NULL, NULL, &tv);
 	switch (res)
 	{
-		//Нет ничего, ждём
+		//РќРµС‚ РЅРёС‡РµРіРѕ, Р¶РґС‘Рј
 		case 0 :
 			break;
 		
-		//Ошибка, закрываем дескриптор
+		//РћС€РёР±РєР°, Р·Р°РєСЂС‹РІР°РµРј РґРµСЃРєСЂРёРїС‚РѕСЂ
 		case INOTIFY_ERROR:
 			close(this->inotify);
 			this->inotify = INOTIFY_ERROR;
 			break;
 		
 	default:
-		//Есть изменения
+		//Р•СЃС‚СЊ РёР·РјРµРЅРµРЅРёСЏ
 		size_t size = sizeof(struct inotify_event) + NAME_MAX + 1;
 		char* buff = static_cast<char*>(malloc(size));
 		memset(buff, 0, size);
